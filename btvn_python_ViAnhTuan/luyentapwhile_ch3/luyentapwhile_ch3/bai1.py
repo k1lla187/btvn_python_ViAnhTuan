@@ -6,3 +6,4 @@ while i <= 10:
     i += 1
 
 print("Tích của 10 số tự nhiên đầu tiên là:", tich)
+# bai 1 while 
