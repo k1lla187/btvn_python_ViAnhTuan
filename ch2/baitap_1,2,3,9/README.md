@@ -1,127 +1,90 @@
-# HỆ THỐNG QUẢN LÝ NHÂN VIÊN CÔNG TY ABC (ENHANCED)
+# HỆ THỐNG QUẢN LÝ NHÂN VIÊN CÔNG TY ABC
 
-## 📋 MÔ TẢ BÀI TOÁN
+## 📋 GIỚI THIỆU CHƯƠNG TRÌNH
 
-Hệ thống quản lý nhân viên (EMS) phiên bản nâng cấp, tích hợp giao diện đồ họa (GUI) hiện đại, hỗ trợ lưu trữ dữ liệu bền vững và các chức năng quản trị nhân sự nâng cao.
-
----
-
-## 🎯 Các chức năng chính
-
-### 1️⃣ Giao diện người dùng hiện đại (GUI)
-- **Dashboard**: Tổng quan số lượng nhân sự theo từng loại.
-- **Directory**: Quản lý danh sách nhân viên trực quan với bảng dữ liệu.
-- **Forms**: Thêm, sửa, thăng chức và phân công dự án qua các hộp thoại tương tác.
-
-### 2️⃣ Quản lý nhân sự và Hiệu suất
-- **Lưu trữ dữ liệu**: Tự động lưu và tải dữ liệu từ file `employees.json`.
-- **Thăng chức (Promotion)**: Chuyển đổi trạng thái nhân viên (Intern → Developer → Manager) mà vẫn giữ nguyên điểm hiệu suất và dự án.
-- **Tính lương**: Công thức tính lương tự động cập nhật theo chức vụ mới.
+Hệ thống Quản lý Nhân viên (EMS) là một ứng dụng Python chuyên nghiệp được thiết kế để giải quyết trọn vẹn các yêu cầu về Lập trình hướng đối tượng (OOP). Chương trình tích hợp giao diện **WinForm** hiện đại, cơ chế lưu trữ dữ liệu bền vững và các nghiệp vụ nhân sự nâng cao như quản lý dự án, thăng chức và đền bù hợp đồng.
 
 ---
 
-## 📁 Cấu trúc Project (Cập nhật)
+## 🎯 PHÂN TÍCH CHỨC NĂNG
 
-```
+Hệ thống được thiết kế để bao quát 4 nhóm chức năng cốt lõi của một phần mềm quản lý doanh nghiệp:
+
+### 1. Quản trị Nhân sự Master-Detail
+- **Quản lý đa dạng cấp bậc**: Hỗ trợ 3 loại hình nhân viên (Manager, Developer, Intern) với các thuộc tính đặc thù (ngôn ngữ lập trình, chuyên ngành, quy mô team).
+- **Thăng chức thông minh**: Chuyển đổi linh hoạt giữa các cấp bậc (Intern -> Dev -> Manager) mà không làm mất dữ liệu lịch sử hiệu suất.
+- **Thôi việc & Đền bù**: Tự động tính toán khoản đền bù hợp đồng (2 tháng lương tổng) khi cho nhân viên nghỉ việc.
+
+### 2. Quản lý Tiền lương & Đãi ngộ
+- **Công thức lương động**: Mỗi chức vụ có một thuật toán tính lương riêng, tự động áp dụng khi thăng chức.
+- **Điều chỉnh lương**: Hỗ trợ cả tăng lương và giảm lương cơ bản (có cơ chế bảo vệ lương tối thiểu > 1 triệu VNĐ).
+- **Báo cáo tài chính**: Thống kê tổng quỹ lương toàn công ty và danh sách Top 3 lương cao nhất.
+
+### 3. Quản lý & Thống kê Dự án
+- **Phân bổ dự án**: Mỗi nhân viên có thể tham gia tối đa 5 dự án.
+- **Thống kê tải trọng**: Sắp xếp nhân viên dựa trên số lượng dự án họ đang tham gia (từ nhiều nhất đến ít nhất).
+- **Tra cứu người tham gia**: Tìm kiếm nhanh tất cả nhân viên đang thực hiện một dự án cụ thể.
+
+### 4. Lưu trữ & Tìm kiếm
+- **Persistence (Bền vững)**: Dữ liệu được lưu trữ dưới dạng file JSON (`employees.json`), đảm bảo không bị mất sau khi đóng ứng dụng.
+- **Tìm kiếm đa năng**: Hỗ trợ tìm nhân viên theo ID hoặc tên (tìm kiếm mờ - fuzzy search).
+
+---
+
+## 💻 PHÂN TÍCH MÃ NGUỒN (CODE ANALYSIS)
+
+Dự án này là minh chứng điển hình cho việc áp dụng các chuẩn mực phần mềm chất lượng cao:
+
+### 1. Áp dụng 4 Tính chất OOP
+- **Tính Trừu tượng (Abstraction)**: Sử dụng lớp cha ảo `Employee` và `ABC` (Abstract Base Class) để định nghĩa bộ khung hành vi chung cho toàn bộ nhân sự.
+- **Tính Kế thừa (Inheritance)**: Các lớp con (`Manager`, `Developer`, `Intern`) kế thừa các thuộc tính nền tảng từ `Employee`, giúp giảm thiểu mã nguồn trùng lặp.
+- **Tính Đa hình (Polymorphism)**: Phương thức `calculate_salary()` được ghi đè (override) ở mỗi lớp con, cho phép hệ thống tính lương đúng cho từng người chỉ bằng một lệnh gọi duy nhất.
+- **Tính Đóng gói (Encapsulation)**: Sử dụng `@property` và các tham số protected (`_field`) để bảo vệ dữ liệu, ngăn chặn việc gán giá trị sai (như tuổi < 18 hoặc điểm > 10).
+
+### 2. Kiến trúc Module (Clean Code)
+Dự án tuân thủ nguyên tắc **Separation of Concerns** (Phân tách trách nhiệm):
+- **Models**: Định nghĩa dữ liệu và thực thể.
+- **Services**: Giải quyết logic nghiệp vụ và tính toán.
+- **UI**: Tách biệt hoàn toàn giao diện (CLI và GUI) khỏi logic xử lý.
+- **Exceptions**: Hệ thống lỗi tùy chỉnh giúp kiểm soát các trường hợp ngoại lệ nghiệp vụ.
+
+### 3. Modern Python Features
+- **Type Hinting**: Sử dụng chú thích kiểu dữ liệu (Python 3.5+) giúp mã nguồn tự tường minh và giảm thiểu lỗi logic.
+- **Unit Testing**: Hệ thống được kiểm thử tự động toàn diện qua module `unittest`, đảm bảo các chức năng HR và Tài chính hoạt động chính xác 100%.
+- **Vietnamese Docstrings**: Toàn bộ mã nguồn được tài liệu hóa bằng tiếng Việt chuẩn, giải thích kỹ lưỡng các khái niệm kỹ thuật được áp dụng.
+
+---
+
+## 🔧 HƯỚNG DẪN CÀI ĐẶT & CHẠY
+
+### 1. Cấu trúc Thư mục
+```text
 employee_management/
-│
-├── gui_main.py                      # Giao diện đồ họa chính (Khuyên dùng)
-├── main.py                          # Giao diện dòng lệnh (CLI)
-│
-├── data/                            # Thư mục lưu trữ dữ liệu
-│   └── employees.json               # Cơ sở dữ liệu JSON
-│
-├── models/                          # Các lớp định nghĩa (Intern, Developer, Manager)
-├── services/                        # Logic xử lý (Company, Payroll)
-├── utils/                           # Validators, Formatters
-└── exceptions/                      # Ngoại lệ tùy chỉnh
+├── data/               # Cửa sổ lưu trữ file JSON
+├── exceptions/         # Các định nghĩa lỗi tùy chỉnh
+├── models/             # Định nghĩa lớp đối tượng nhân viên
+├── services/           # Logic quản lý công ty và bảng lương
+├── tests/              # Bộ kiểm thử tự động
+├── ui/                 # Giao diện CLI và GUI con
+├── utils/              # Tiện ích định dạng và kiểm tra
+├── gui_main.py         # Điểm chạy giao diện WinForm (Chính)
+└── main.py             # Điểm chạy giao diện dòng lệnh (CLI)
 ```
 
----
-
-## 🔧 Hướng dẫn chạy chương trình
-
-### Cách 1: Chạy Giao diện đồ họa (GUI) - Khuyên dùng
-```bash
-python gui_main.py
-```
-
-### Cách 2: Chạy Giao diện dòng lệnh (CLI)
-```bash
-python main.py
-```
+### 2. Cách chạy
+- **Chạy Giao diện WinForm**: `python gui_main.py`
+- **Chạy Giao diện dòng lệnh**: `python main.py`
+- **Chạy Kiểm thử (Unit Test)**: `python -m unittest discover tests`
 
 ---
 
-## 💡 Các tính năng mới tiêu biểu
-
-### 1. Lưu trữ bền vững (Persistence)
-Dữ liệu sẽ không bị mất khi đóng chương trình. Mọi thay đổi về nhân sự, điểm số hay dự án đều được ghi lại vào `data/employees.json`.
-
-### 2. Thăng chức chuyên nghiệp
-- **Intern → Developer**: Yêu cầu nhập ngôn ngữ lập trình chuyên môn.
-- **Developer → Manager**: Yêu cầu nhập quy mô team quản lý.
-- Hệ thống tự động chuyển đổi lớp đối tượng (Casting) và áp dụng công thức lương mới ngay lập tức.
-
-### 3. Thống kê thông minh
-Giao diện Statistics cung cấp cái nhìn sâu sắc về:
-- Điểm hiệu suất trung bình toàn công ty.
-- Số lượng nhân viên xuất sắc và nhân viên cần cải thiện.
-- Độ tuổi trung bình của lực lượng lao động.
+## 📝 GIẢI PHÁP CHO BÀI TẬP 1, 2, 3, 9
+Dự án này là lời giải tổng hợp và nâng cao cho chuỗi bài tập:
+- **Bài 1**: Xây dựng lớp đối tượng cơ bản.
+- **Bài 2**: Quản lý danh sách đối tượng.
+- **Bài 3**: Kế thừa và Đa hình trong quản lý lương.
+- **Bài 9**: Xử lý ngoại lệ, File JSON và giao diện người dùng chuyên nghiệp.
 
 ---
-
-## 📊 Cấu trúc Lớp (UML Class Diagram)
-
-```mermaid
-classDiagram
-    class Employee {
-        <<Abstract>>
-        -String emp_id
-        -String name
-        -int age
-        -float base_salary
-        -float performance_score
-        -List projects
-        +calculate_salary()* float
-        +add_project(name)
-    }
-    class Manager {
-        -int team_size
-        +calculate_salary() float
-    }
-    class Developer {
-        -String programming_language
-        +calculate_salary() float
-    }
-    class Intern {
-        -String major
-        +calculate_salary() float
-    }
-    class Company {
-        -Dict employees
-        +add_employee(emp)
-        +promote_employee(id, type)
-        +save_to_json(path)
-    }
-
-    Employee <|-- Manager
-    Employee <|-- Developer
-    Employee <|-- Intern
-    Company o-- Employee
-```
-
----
-
-## 📝 Ghi chú cho Bài tập 1, 2, 3, 9
-Dự án này áp dụng các kỹ thuật OOP và phát triển phần mềm chuẩn mực:
-- **Kế thừa & Trừu tượng**: Sử dụng lớp cha `Employee` và `ABC` để định nghĩa bộ khung chung.
-- **Đa hình**: Phương thức `calculate_salary()` được ghi đè ở mỗi lớp con để xử lý logic riêng.
-- **Dependency Management**: Phân tách rõ ràng giữa Model, Service, và UI (CLI/GUI).
-- **Type Hinting**: Toàn bộ mã nguồn được chú thích kiểu dữ liệu (Python 3.5+) giúp công cụ lập trình hỗ trợ tốt hơn.
-- **Unit Testing**: Hệ thống được kiểm thử tự động qua module `unittest`.
-
----
-
 **Người thực hiện**: Vi Anh Tuấn  
 **Môn học**: Lập trình hướng đối tượng (OOP) – Python

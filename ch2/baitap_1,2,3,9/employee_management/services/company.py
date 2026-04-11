@@ -109,17 +109,22 @@ class Company:
         """Trả về Top 3 nhân viên có mức lương cao nhất."""
         return sorted(self.employees.values(), key=lambda x: x.calculate_salary(), reverse=True)[:3]
 
+    def get_employees_sorted_by_projects(self) -> List[Employee]:
+        """
+        Thống kê và sắp xếp nhân viên theo số lượng dự án tham gia.
+        Từ nhiều nhất đến ít nhất.
+        """
+        return sorted(self.employees.values(), key=lambda x: len(x.projects), reverse=True)
+
+    def get_employees_by_project(self, project_name: str) -> List[Employee]:
+        """
+        Lấy danh sách nhân viên tham gia vào một dự án cụ thể.
+        """
+        return [e for e in self.employees.values() if project_name.lower() in [p.lower() for p in e.projects]]
+
     def promote_employee(self, emp_id: str, new_type: str, extra_info: Union[str, int]) -> Employee:
         """
         Thăng chức hoặc chuyển đổi loại nhân viên.
-        
-        Args:
-            emp_id (str): Mã nhân viên.
-            new_type (str): Loại mới ('Developer' hoặc 'Manager').
-            extra_info: Thông tin bổ sung (ngôn ngữ lập trình hoặc quy mô team).
-            
-        Returns:
-            Employee: Đối tượng nhân viên mới sau khi thăng chức.
         """
         old_emp = self.find_employee_by_id(emp_id)
         
@@ -137,6 +142,40 @@ class Company:
             
         self.employees[emp_id] = new_emp
         return new_emp
+
+    def decrease_salary(self, emp_id: str, amount: float) -> float:
+        """
+        Giảm lương cơ bản của nhân viên.
+        
+        Args:
+            emp_id (str): Mã nhân viên.
+            amount (float): Số tiền giảm.
+            
+        Returns:
+            float: Mức lương mới sau khi giảm.
+            
+        Raises:
+            ValueError: Nếu mức lương sau giảm thấp hơn 1.000.000 VNĐ.
+        """
+        emp = self.find_employee_by_id(emp_id)
+        new_salary = emp.base_salary - amount
+        if new_salary < 1000000:
+            raise ValueError("Mức lương không được giảm xuống dưới 1.000.000 VNĐ")
+        emp.base_salary = new_salary
+        return new_salary
+
+    def terminate_employee(self, emp_id: str) -> float:
+        """
+        Cho nhân viên nghỉ việc và tính toán đền bù hợp đồng.
+        Công thức đền bù: 2 tháng lương tổng hiện tại.
+        
+        Returns:
+            float: Số tiền đền bù.
+        """
+        emp = self.find_employee_by_id(emp_id)
+        compensation = emp.calculate_salary() * 2
+        self.remove_employee(emp_id)
+        return compensation
 
     def save_to_json(self, filepath: str) -> None:
         """Lưu toàn bộ danh sách nhân viên vào tệp JSON."""

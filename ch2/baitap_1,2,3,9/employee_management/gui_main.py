@@ -82,14 +82,21 @@ class EmployeeWinForm(tk.Tk):
         manage_menu.add_command(label="Thêm Developer...", command=lambda: self.add_employee_dialog('Developer'))
         manage_menu.add_command(label="Thêm Intern...", command=lambda: self.add_employee_dialog('Intern'))
         manage_menu.add_separator()
+        manage_menu.add_command(label="Tăng lương...", command=self.increase_salary)
+        manage_menu.add_command(label="Giảm lương...", command=self.decrease_salary)
+        manage_menu.add_separator()
         manage_menu.add_command(label="Xóa nhân viên", command=self.delete_employee)
         manage_menu.add_command(label="Thăng chức...", command=self.promote_employee)
+        manage_menu.add_command(label="Cho nghỉ việc (Đền bù)...", command=self.terminate_employee)
         self.menubar.add_cascade(label="Quản lý Nhân sự", menu=manage_menu)
 
         # Menu Báo cáo
         report_menu = tk.Menu(self.menubar, tearoff=0)
         report_menu.add_command(label="Tổng hợp quỹ lương", command=self.show_payroll_stats)
         report_menu.add_command(label="Thống kê hiệu suất", command=self.show_performance_stats)
+        report_menu.add_separator()
+        report_menu.add_command(label="Phân bổ Dự án (Sắp xếp)", command=self.show_project_stats)
+        report_menu.add_command(label="Tìm nhân viên theo Dự án", command=self.find_by_project)
         self.menubar.add_cascade(label="Báo cáo", menu=report_menu)
 
         # Menu Trợ giúp
@@ -132,7 +139,7 @@ class EmployeeWinForm(tk.Tk):
         left_frame = ttk.Frame(paned)
         paned.add(left_frame, weight=3)
 
-        columns = ("id", "name", "type", "salary", "performance")
+        columns = ("id", "name", "type", "salary", "performance", "projects")
         self.tree = ttk.Treeview(left_frame, columns=columns, show="headings", selectmode="browse")
         
         self.tree.heading("id", text="Mã NV", command=lambda: self.sort_tree("id"))
@@ -140,12 +147,14 @@ class EmployeeWinForm(tk.Tk):
         self.tree.heading("type", text="Chức vụ", command=lambda: self.sort_tree("type"))
         self.tree.heading("salary", text="Lương (VNĐ)", command=lambda: self.sort_tree("salary"))
         self.tree.heading("performance", text="Điểm HS", command=lambda: self.sort_tree("performance"))
+        self.tree.heading("projects", text="Số Dự án", command=lambda: self.sort_tree("projects"))
 
         self.tree.column("id", width=80, anchor="center")
         self.tree.column("name", width=200)
         self.tree.column("type", width=120, anchor="center")
         self.tree.column("salary", width=150, anchor="e")
         self.tree.column("performance", width=80, anchor="center")
+        self.tree.column("projects", width=80, anchor="center")
 
         scroll = ttk.Scrollbar(left_frame, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll.set)
@@ -221,7 +230,8 @@ class EmployeeWinForm(tk.Tk):
                 emp.name,
                 emp.__class__.__name__,
                 Formatters.format_currency(emp.calculate_salary()),
-                f"{emp.performance_score}/10"
+                f"{emp.performance_score}/10",
+                len(emp.projects)
             ))
         self.update_status(f"Đã tải {len(self.company.get_all_employees())} nhân viên.")
 
@@ -303,6 +313,41 @@ class EmployeeWinForm(tk.Tk):
             self.refresh_table()
             self.on_employee_select(None)
 
+    def increase_salary(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Cảnh báo", "Vui lòng chọn một nhân viên!")
+            return
+        
+        emp_id = selected[0]
+        emp = self.company.find_employee_by_id(emp_id)
+        
+        amount = simpledialog.askfloat("Tăng lương", f"Nhập số tiền tăng cho {emp.name} (VNĐ):", minvalue=0)
+        if amount:
+            emp.base_salary += amount
+            self.save_data()
+            self.refresh_table()
+            messagebox.showinfo("Thành công", f"Đã tăng lương thành công cho {emp.name}")
+
+    def decrease_salary(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Cảnh báo", "Vui lòng chọn một nhân viên!")
+            return
+        
+        emp_id = selected[0]
+        emp = self.company.find_employee_by_id(emp_id)
+        
+        amount = simpledialog.askfloat("Giảm lương", f"Nhập số tiền giảm cho {emp.name} (VNĐ):", minvalue=0)
+        if amount:
+            try:
+                self.company.decrease_salary(emp_id, amount)
+                self.save_data()
+                self.refresh_table()
+                messagebox.showinfo("Thành công", f"Đã giảm lương thành công cho {emp.name}")
+            except Exception as e:
+                messagebox.showerror("Lỗi", str(e))
+
     def delete_employee(self):
         selected = self.tree.selection()
         if not selected:
@@ -362,6 +407,24 @@ class EmployeeWinForm(tk.Tk):
             except Exception as e:
                 messagebox.showerror("Lỗi", str(e))
 
+    def terminate_employee(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Cảnh báo", "Vui lòng chọn nhân viên!")
+            return
+        
+        emp_id = selected[0]
+        emp = self.company.find_employee_by_id(emp_id)
+        
+        if messagebox.askyesno("Xác nhận Cho nghỉ việc", f"Bạn có chắc muốn cho nhân viên {emp.name} nghỉ việc?\nHành động này sẽ tính toán khoản đền bù hợp đồng."):
+            try:
+                compensation = self.company.terminate_employee(emp_id)
+                self.save_data()
+                self.refresh_table()
+                messagebox.showinfo("Kết quả Đền bù", f"Nhân viên {emp.name} đã nghỉ việc.\nSố tiền đền bù hợp đồng là: {Formatters.format_currency(compensation)}")
+            except Exception as e:
+                messagebox.showerror("Lỗi", str(e))
+
     def show_payroll_stats(self):
         total = self.company.calculate_total_payroll()
         count = len(self.company.get_all_employees())
@@ -380,6 +443,29 @@ class EmployeeWinForm(tk.Tk):
         for i, emp in enumerate(top, 1):
             msg += f"{i}. {emp.name} - Điểm: {emp.performance_score}\n"
         messagebox.showinfo("Báo cáo Hiệu suất", msg)
+
+    def show_project_stats(self):
+        employees = self.company.get_employees_sorted_by_projects()
+        if not employees: return
+        
+        msg = "THỐNG KÊ PHÂN BỔ DỰ ÁN (Nhiều -> Ít):\n\n"
+        for i, emp in enumerate(employees, 1):
+            msg += f"{i}. {emp.name}: {len(emp.projects)} dự án\n"
+        messagebox.showinfo("Báo cáo Dự án", msg)
+
+    def find_by_project(self):
+        p_name = simpledialog.askstring("Tìm theo Dự án", "Nhập tên dự án cần tra cứu:")
+        if not p_name: return
+        
+        employees = self.company.get_employees_by_project(p_name)
+        if not employees:
+            messagebox.showinfo("Kết quả", f"Không tìm thấy nhân viên nào tham gia dự án '{p_name}'")
+            return
+        
+        msg = f"DANH SÁCH NHÂN VIÊN THAM GIA DỰ ÁN '{p_name}':\n\n"
+        for i, emp in enumerate(employees, 1):
+            msg += f"{i}. {emp.name} ({emp.emp_id})\n"
+        messagebox.showinfo("Kết quả Tra cứu", msg)
 
     def sort_tree(self, col):
         """Sắp xếp lại bảng khi nhấn vào tiêu đề cột."""
