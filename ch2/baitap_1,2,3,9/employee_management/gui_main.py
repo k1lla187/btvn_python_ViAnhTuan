@@ -217,14 +217,30 @@ class EmployeeWinForm(tk.Tk):
     def update_status(self, message: str):
         self.status_var.set(message)
 
-    def refresh_table(self):
-        """Tải lại dữ liệu lên bảng."""
+    def refresh_table(self, query: Optional[str] = None):
+        """
+        Tải lại dữ liệu lên bảng.
+        Nếu có query, chỉ hiển thị những nhân viên khớp với từ khóa.
+        """
         # Xóa dữ liệu cũ
         for item in self.tree.get_children():
             self.tree.delete(item)
         
         # Thêm dữ liệu mới
-        for emp in self.company.get_all_employees():
+        employees = self.company.get_all_employees()
+        count = 0
+        
+        for emp in employees:
+            # Kiểm tra bộ lọc nếu có
+            if query:
+                match_fields = [
+                    emp.emp_id,
+                    emp.name,
+                    emp.__class__.__name__
+                ]
+                if not any(query.lower() in str(f).lower() for f in match_fields):
+                    continue
+
             self.tree.insert("", "end", iid=emp.emp_id, values=(
                 emp.emp_id,
                 emp.name,
@@ -233,16 +249,17 @@ class EmployeeWinForm(tk.Tk):
                 f"{emp.performance_score}/10",
                 len(emp.projects)
             ))
-        self.update_status(f"Đã tải {len(self.company.get_all_employees())} nhân viên.")
+            count += 1
+            
+        if query:
+            self.update_status(f"Tìm thấy {count} kết quả cho '{query}'.")
+        else:
+            self.update_status(f"Đã tải {len(employees)} nhân viên.")
 
     def filter_table(self):
-        query = self.search_var.get().lower()
-        for item in self.tree.get_children():
-            values = self.tree.item(item)['values']
-            if any(query in str(v).lower() for v in values):
-                self.tree.reattach(item, "", "end")
-            else:
-                self.tree.detach(item)
+        """Handler khi người dùng nhập vào ô tìm kiếm."""
+        query = self.search_var.get().strip()
+        self.refresh_table(query if query else None)
 
     def on_employee_select(self, event):
         selected = self.tree.selection()

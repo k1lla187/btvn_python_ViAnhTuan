@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "type": "Manager",
+        "id": "0001",
+        "name": "Nguyễn Văn A",
+        "age": 32,
+        "salary": 6000000.0,
+        "performance": 7.0,
+        "projects": [],
+        "team_size": 5
+    }
+]
