@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RegistrationForm</class>
+ <widget class="QWidget" name="RegistrationForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>550</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Đăng ký thành viên</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
+   
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="font">
+      <font><pointsize>24</pointsize><bold>true</bold></font>
+     </property>
+     <property name="text">
+      <string>Đăng ký</string>
+     </property>
+    </widget>
+   </item>
+   
+   <item>
+    <widget class="QLabel" name="lblSubtitle">
+     <property name="text">
+      <string>Nhanh chóng và dễ dàng</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: gray;</string>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="layoutName">
+     <item>
+      <widget class="QLineEdit" name="txtHo">
+       <property name="placeholderText">
+        <string>Họ</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtTen">
+       <property name="placeholderText">
+        <string>Tên</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QLineEdit" name="txtContact">
+     <property name="placeholderText">
+      <string>Số di động hoặc email</string>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QLineEdit" name="txtPassword">
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Mật khẩu mới</string>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="lblDob">
+     <property name="text">
+      <string>Ngày sinh</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layoutDob">
+     <item>
+      <widget class="QComboBox" name="cbDay"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbMonth"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbYear"/>
+     </item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="lblGender">
+     <property name="text">
+      <string>Giới tính</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layoutGender">
+     <item>
+      <widget class="QRadioButton" name="radNam">
+       <property name="text">
+        <string>Nam</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radNu">
+       <property name="text">
+        <string>Nữ</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="lblPolicy">
+     <property name="text">
+      <string>Bằng cách nhấp vào Đăng ký, bạn đồng ý với Điều khoản...</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 10px; color: #606770;</string>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QCheckBox" name="chkAgree">
+     <property name="text">
+      <string>Tôi đồng ý với các điều khoản trên</string>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QPushButton" name="btnRegister">
+     <property name="minimumSize">
+      <size><width>150</width><height>40</height></size>
+     </property>
+     <property name="text">
+      <string>Đăng ký</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #00a400; color: white; font-weight: bold; border-radius: 5px;</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
